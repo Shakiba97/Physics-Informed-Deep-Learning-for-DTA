@@ -8,21 +8,6 @@ This repository accompanies the paper:
 
 A **Physics-Informed Deep Learning (PIDL)** framework for Dynamic Traffic Assignment (DTA) that simultaneously: (1) calibrates network parameters from real-world data, (2) predicts traffic states for future time intervals, and (3) enhances the approximate travel time function used in the DTA model. The framework bridges the gap between analytical DTA models — which are mathematically rigorous but computationally expensive — and purely data-driven approaches, which lack physical interpretability and require large amounts of data.
 
-
-## Table of Contents
-
-- [Background](#background)
-- [Method Overview](#method-overview)
-- [Repository Structure](#repository-structure)
-- [File Reference](#file-reference)
-- [Dependencies](#dependencies)
-- [Setup](#setup)
-- [Running the Model](#running-the-model)
-- [Outputs](#outputs)
-- [Results](#results)
-- [Citation](#citation)
-
-
 ## Background
 
 Analytical DTA models integrate two mathematically distinct components — a behavioral model for travelers' route and departure-time choices, and a traffic dynamics model (Dynamic Network Loading) — making DTA one of the most challenging problems in transportation science. While analytical models such as the Differential Complementarity System (DCS) formulation of Ban et al. provide rigorous traffic state representations, they face four key challenges:
