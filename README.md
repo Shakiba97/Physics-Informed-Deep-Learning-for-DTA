@@ -102,7 +102,7 @@ for each epoch:
         compute Loss(θ₂, γ) → backpropagate NN#2
 ```
 <p align="center">
-  <img src="outputs/pics/Picture3.png" width="90%"/>
+  <img src="outputs/pics/Picture3.png" width="60%"/>
 </p>
 
 NN#1 converges to stable parameter estimates after approximately **200 iterations**. NN#2 exhibits training fluctuations due to zero-demand periods at the boundaries of the study window, which is identified as an area for future improvement.
