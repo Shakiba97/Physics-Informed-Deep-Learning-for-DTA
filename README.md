@@ -234,9 +234,9 @@ This is validated on link 3 at time step 21: the DTA model estimated an addition
 
 Training loss curves and γ convergence:
 
-| NN#1 Loss | NN#2 Loss | γ Convergence |
-|---|---|---|
-| ![NN1](outputs/plots/Totalloss_NN%231.png) | ![NN2](outputs/plots/Totalloss_NN%232.png) | ![gamma](outputs/plots/gamma.png) |
+| NN#1 and NN#2 Loss | γ Convergence |
+|---|---|
+| ![NN1](outputs/pics/Picture4.png) | ![gamma](outputs/pics/Picture5.png) |
 
 
 ## Citation
