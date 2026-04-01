@@ -202,7 +202,6 @@ Training is CPU/GPU agnostic — a CUDA device will be used automatically if ava
 
 > **Note:** Each training iteration calls a MATLAB engine and a GAMS solve. Training is intentionally compute-heavy — expect several minutes per epoch. NN#1 typically converges around 200 iterations.
 
----
 
 ## Outputs
 
@@ -216,7 +215,6 @@ Training is CPU/GPU agnostic — a CUDA device will be used automatically if ava
 | `*_phy.csv`, `*_ob.csv` | `outputs/results/` | Physics vs. observed traffic state comparisons |
 | `Totalloss*.png`, `gamma.png` | `outputs/plots/` | Training loss curves and learned γ trajectory |
 
----
 
 ## Results
 
@@ -252,11 +250,8 @@ Training loss curves and γ convergence:
 |---|---|---|
 | ![NN1](outputs/plots/Totalloss_NN%231.png) | ![NN2](outputs/plots/Totalloss_NN%232.png) | ![gamma](outputs/plots/gamma.png) |
 
----
 
 ## Citation
-
-If you use this code or build on this work, please cite:
 
 ```bibtex
 @article{naderian2023pidl_dta,
