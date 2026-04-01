@@ -36,8 +36,12 @@ Queue dynamics are governed by:
 ```
 q̇ᵘᵢⱼ(t) = pᵢⱼ(t) − vᵢⱼ(t − τᵚᵢⱼ)
 q̇ᵈᵢⱼ(t) = pᵢⱼ(t − τ⁰ᵢⱼ) − vᵢⱼ(t)
-```  
-![](outputs/pics/Picture1.png)  |  ![](outputs/pics/Picture2.png)  
+```
+<p align="center">
+  <img src="outputs/pics/Picture1.png" width="45%"/>
+  &nbsp;&nbsp;
+  <img src="outputs/pics/Picture2.png" width="45%"/>
+</p>
 
 **Hidden variables** μᵢⱼ(t) (withheld exit flow due to downstream congestion) and ηᵢⱼ(t) (withheld inflow due to spillback) are encoded as complementarity constraints. These are the variables that are difficult to solve analytically and are estimated by NN#2.
 
