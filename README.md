@@ -8,13 +8,11 @@ This repository accompanies the paper:
 
 A **Physics-Informed Deep Learning (PIDL)** framework for Dynamic Traffic Assignment (DTA) that simultaneously: (1) calibrates network parameters from real-world data, (2) predicts traffic states for future time intervals, and (3) enhances the approximate travel time function used in the DTA model. The framework bridges the gap between analytical DTA models — which are mathematically rigorous but computationally expensive — and purely data-driven approaches, which lack physical interpretability and require large amounts of data.
 
----
 
 ## Table of Contents
 
 - [Background](#background)
 - [Method Overview](#method-overview)
-- [Network and Data](#network-and-data)
 - [Repository Structure](#repository-structure)
 - [File Reference](#file-reference)
 - [Dependencies](#dependencies)
@@ -24,7 +22,6 @@ A **Physics-Informed Deep Learning (PIDL)** framework for Dynamic Traffic Assign
 - [Results](#results)
 - [Citation](#citation)
 
----
 
 ## Background
 
@@ -37,7 +34,6 @@ Analytical DTA models integrate two mathematically distinct components — a beh
 
 Pure learning-based approaches (e.g., GCNNs, FFNNs) can approximate complex DTA components but are sensitive to data noise and lack physical interpretability. This project integrates the two paradigms through PIDL, using both physics-generated *collocation data* and SUMO-simulated *observation data* to train two neural networks.
 
----
 
 ## Method Overview
 
@@ -73,7 +69,6 @@ where β is an approximation that the second neural network is trained to correc
 
 In the case study, γ converges to **1.48**, meaning the standard DTA travel time approximation underestimates real-world delay by approximately this factor.
 
----
 
 ### NN#1 — Calibration Network (`DNNCal`)
 
@@ -87,7 +82,6 @@ Loss(θ₁, h) = 0.5 · MSE_O1 + 0.5 · MSE_P1
 
 where MSE_O1 measures error against observed (SUMO) flows and MSE_P1 measures error against collocation (DTA-generated) flows. The parameters being calibrated are τ⁰, τᵚ, and C̄. After calibration, the GEH error for inflow drops from **14.84 to 7.74** on average across all links.
 
----
 
 ### NN#2 — Prediction Network (`DNNHidden`)
 
@@ -121,28 +115,6 @@ for each epoch:
 
 NN#1 converges to stable parameter estimates after approximately **200 iterations**. NN#2 exhibits training fluctuations due to zero-demand periods at the boundaries of the study window, which is identified as an area for future improvement.
 
----
-
-## Network and Data
-
-The case study uses a **6-link chain network** with 7 nodes and 8 links (including dummy origin/destination links). Demand scenarios ranging from **100 to 1,000 vehicles** over a 1-hour study period are distributed across time by the DTA departure-time choice model.
-
-Two datasets are used:
-
-| Dataset | Name in code | Source | Description |
-|---|---|---|---|
-| Collocation | `_phy` / `_col` | GAMS DTA model | Physics-generated traffic states under calibrated parameters |
-| Observation | `_ob` | SUMO simulation | Simulated "real-world" traffic states used as ground truth |
-
-Data generation follows this pipeline:
-1. Build the network in SUMO and extract physical parameters (τ⁰, τᵚ, C̄) from network geometry and speed limits
-2. Run DTA for random demand scenarios to get departure time distributions
-3. Feed departure time distributions back to SUMO to generate observation data (p, v, qd, tt per link per minute)
-4. Use both datasets to train the PIDL framework
-
-The collocation and observation datasets contain per-link, per-timestep values for inflow, outflow, queue, and travel time across the 60-minute study period.
-
----
 
 ## Repository Structure
 
@@ -194,57 +166,6 @@ Physics-Informed-Deep-Learning-for-DTA/
 └── README.md
 ```
 
----
-
-## File Reference
-
-### Python (`src/`)
-
-| File | Description |
-|---|---|
-| `main.py` | Core of the project. Defines `PhysicsInformedNN`, the two-phase training loop, data loading (`read_obs`, `read_given`), min-max normalization utilities, and GAMS config file generation (`save_gams_params`). Each training iteration writes parameters to GAMS, calls MATLAB via `matlab.engine`, reads back `dta.mat`, and computes MSE losses. |
-| `dnn.py` | Defines `DNNCal` (feedforward with ReLU hidden layers and Sigmoid output, predicting flows and calibrated parameters) and `DNNHidden` (branched network: shared sigmoid layers → flow head + β head → bias-free γ layer for travel time). |
-| `network.py` | Road network graph with node and edge objects. Each edge stores τ⁰, τᵚ, C̄, Q̄, and junction priority. Provides `get_edges()`, `get_nodes()`, and `adj` (adjacency matrix). |
-| `logger.py` | Lightweight training logger that records per-iteration loss values for both networks. |
-| `read_results.py` | Loads saved `.mat` and `.csv` outputs after training and produces comparison plots of observed vs. physics-predicted traffic states. |
-
-### GAMS (`gams/`)
-
-| File | Description |
-|---|---|
-| `DQDUE_Priority_CapIn.gms` | Main DTA optimization model implementing the DQDUE (Dynamic Queue-based DUE) formulation with the double-queue model, nodal model, junction priority rules, and capacity constraints from Ma et al. (2018). Solved at each training iteration after Python writes the current parameter configuration. |
-| `gamsSigma.gms` | Computes the sigma variable (queue spillback indicator) used in the nodal model. Called from MATLAB via `WriteSigma.m`. |
-
-### MATLAB (`matlab/`)
-
-| File | Description |
-|---|---|
-| `run.m` | Main MATLAB entry point called from Python via `matlab.engine` each training iteration. Runs the DTA simulation and saves per-link, per-timestep state variables (`p_save`, `v_save`, `qd_save`, `mu_save`, `delta_save`) to `./data/dta.mat`. |
-| `ConvErr.m` | Computes convergence error across DTA inner iterations to determine when the simulation has reached equilibrium. |
-| `WriteSigma.m` | Writes sigma values from MATLAB to disk for GAMS to consume in `gamsSigma.gms`. |
-
-### Data (`data/raw/`)
-
-| File | Description |
-|---|---|
-| `given.mat` | Initial network parameters: τ⁰, τᵚ, C̄, Q̄, edge adjacency list, node priorities, and per-variable min/max normalization bounds (loaded by `read_range()`). Derived from the SUMO network geometry and used as the starting point for calibration. |
-| `obs{n}.mat` | SUMO-simulated observed traffic states for demand scenario `n`. Contains per-link, per-minute values for density (`p_SUMO`), speed (`v_SUMO`), downstream flow (`qd_SUMO`), travel time (`tt_SUMO`), and the total demand level `D` for that scenario. |
-
-### Results (`outputs/results/`)
-
-The `_phy` files contain DTA collocation output; the `_ob` files contain SUMO observation data. Comparing them directly quantifies the calibration quality.
-
-| File | Variable | Unit |
-|---|---|---|
-| `p_phy.csv` / `p_ob.csv` | Link density (inflow) | veh/min |
-| `v_phy.csv` / `v_ob.csv` | Link exit flow (speed) | veh/min |
-| `qd_phy.csv` / `qd_ob.csv` | Downstream queue | vehicles |
-| `beta_phy.csv` | Congestion index β from physics model | dimensionless |
-| `tt_ob.csv` | Travel time observed by SUMO | minutes |
-| `convergence.xlsx` | Training loss per iteration for both networks | — |
-
----
-
 ## Dependencies
 
 This project requires three separate tools installed and accessible on the same machine:
@@ -277,20 +198,6 @@ GAMS must be on your system `PATH`. Verify with:
 gams --version
 ```
 
----
-
-## Setup
-
-```bash
-git clone https://github.com/Shakiba97/Physics-Informed-Deep-Learning-for-DTA.git
-cd Physics-Informed-Deep-Learning-for-DTA
-pip install torch numpy scipy
-mkdir -p data/raw output
-```
-
-Place SUMO-generated observation files (`obs1.mat`, `obs2.mat`, ...) and the initial parameter file (`given.mat`) in `data/raw/`.
-
----
 
 ## Running the Model
 
