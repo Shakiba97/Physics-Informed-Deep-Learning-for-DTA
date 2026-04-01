@@ -1,0 +1,7 @@
+
+*.~gm
+*.asv
+*.lst
+/data/burgers_shock.mat
+*.dat
+*.cmd
