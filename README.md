@@ -164,25 +164,6 @@ This project requires three separate tools installed and accessible on the same 
 | GAMS | 29+ | DTA optimization solver |
 | SUMO | any | Generating observation data (offline, pre-run) |
 
-Install Python dependencies:
-
-```bash
-pip install torch numpy scipy
-```
-
-MATLAB's Python engine must be installed from your MATLAB root:
-
-```bash
-cd /path/to/MATLAB/extern/engines/python
-python setup.py install
-```
-
-GAMS must be on your system `PATH`. Verify with:
-
-```bash
-gams --version
-```
-
 
 ## Running the Model
 
