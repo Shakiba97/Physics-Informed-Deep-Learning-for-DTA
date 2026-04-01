@@ -87,9 +87,8 @@ Loss(θ₂, γ) = α · MSE_O2 + β · MSE_P2,   α + β = 1
 
 where MSE_O2 includes travel time error against SUMO observations, and MSE_P2 includes β error against DTA collocation data.
 
----
 
-### Training Loop
+#### Training Loop
 
 ```
 for each epoch:
@@ -102,6 +101,9 @@ for each epoch:
         read DTA collocation trajectory from dta.mat
         compute Loss(θ₂, γ) → backpropagate NN#2
 ```
+<p align="center">
+  <img src="outputs/pics/Picture3.png" width="90%"/>
+</p>
 
 NN#1 converges to stable parameter estimates after approximately **200 iterations**. NN#2 exhibits training fluctuations due to zero-demand periods at the boundaries of the study window, which is identified as an area for future improvement.
 
